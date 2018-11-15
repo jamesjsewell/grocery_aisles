@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+<body >
+
+  {{#message}}
+    <p>{{message}}<p>
+    <a href="/stores">back to stores</a>
+  {{/message}}
+
+  {{#store}}
+
+  <p>create an aisle in {{store.name}}</p>
+
+  <form action="/aisle" method="POST">
+    <input name="storeId" hidden value="{{store.id}}" />
+    <input name="name" placeholder="name of aisle" />
+    <input type="submit" />
+  </form>
+
+  
+  <p>create an item</p>
+
+  <form action="/product" method="POST">
+
+    <select name="aisle">
+      {{#aisles}}
+        <option value="{{id}}">{{name}}</option>
+      {{/aisles}}
+    </select>
+
+    <input hidden name="storeId" value="{{id}}" />
+    <input type="text" name="name" placeholder="name of item" />
+    <input type="number" name="quantity" placeholder="quantity" />
+    <input type="float" name="price" placeholder="price" />
+    <input type="submit" />
+
+  </form>
+
+  {{#aisles}}
+  
+    <ul>
+
+      {{name}}
+
+      {{#products}}
+
+        <li>
+          {{name}}
+        </li>
+
+      {{/products}}
+
+    </ul>
+    <br/>
+
+  {{/aisles}}
+
+  {{/store}}
+
+</body>
+</html>
