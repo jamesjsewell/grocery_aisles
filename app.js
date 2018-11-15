@@ -3,10 +3,11 @@ const app = express()
 const mustacheExpress = require('mustache-express')
 var bodyParser = require('body-parser')
 const db = require('./models')
-
+const path = require('path')
 const { user, list, store, aisle, product } = db
 
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.static(path.join(__dirname, '/public')))
 app.engine('mustache',mustacheExpress())
 app.set('views','./views')
 app.set('view engine','mustache')
@@ -102,8 +103,16 @@ app.get('/store/:id', function(req, res){
     res.render('store', { store: store })
 
   }
+  
+  var id = parseInt(req.params.id)
 
-  getStoreInventory(req.params.id, onStoreFound)
+  if( id && typeof id === 'number' && !isNaN(id) ){
+    getStoreInventory(req.params.id, onStoreFound)
+  }
+  else{
+    res.end()
+  }
+  
 
 })
 

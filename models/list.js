@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   list.associate = function(models) {
     // associations can be defined here
-    list.hasOne(models.aisle, { foreignKey: 'aisle_id', through: 'list_aisle_joins' })
+    //list.hasOne(models.aisle, { foreignKey: 'aisle_id', through: 'list_aisle_joins' })
    
   };
   return list;
