@@ -42,20 +42,66 @@ app.post('/list', function(req, res){
   
 })
 
+app.get('/shop/store/:storeId', function(req, res){
+
+  var storeId = req.params.storeId
+  var userId = 1
+
+  list.findAll({
+    where: { store_id: parseInt(storeId), user_id: 1 }, 
+    include: 
+    [
+      { 
+        model: store, 
+        include: [
+          { 
+            model: aisle, 
+            include: [ { model: product } ] 
+          }
+        ] 
+      }
+    ]
+  }).then((results)=>{  
+    console.log(results)
+  
+    if(results){
+
+      results.forEach(function(result){
+
+        var store = result.get({ plain: true })  
+        console.log(store) 
+        //return res.render('shop', { store: store })
+
+      })
+      
+    }
+    else{
+      
+    }
+
+    return res.render('shop', { store: null })
+    
+  }).catch(function(err){
+      console.log(err)
+      return res.render('error_message', { message: "something went wrong", route: "/store/" + req.params.id })
+  })
+
+})
+
 // stores
 app.get('/store/:id', function(req, res){
  
   store.findOne({
     where: { id: parseInt(req.params.id) }, include: [{ model: aisle, include: [ {model: product} ] }]
   }).then((result)=>{
+
     if(result){
-        var store = result.get({ plain: true })    
-        return res.render('store', { store: store })
+      var store = result.get({ plain: true })    
+      return res.render('store', { store: store })
     }
     else{
       return res.render('store', { message: "store not found" })
     }
-
     
   }).catch(function(err){
       console.log(err)

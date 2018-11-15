@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   list.associate = function(models) {
     // associations can be defined here
+    list.hasMany(models.store, { foreignKey: { name: 'id' } })
   };
   return list;
 };
