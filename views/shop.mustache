@@ -2,15 +2,40 @@
 <html>
 <body >
 
-  <form>
-
-  </form>
-
   {{#store}}
+    <h3>Inventory at {{name}}</h3>
     {{#aisles}}
-      {{name}}
+      <div>
+        <h4> {{name}} </h4>
+        {{#products}}
+          <form action="/list" method="POST">
+            <input name="storeId" hidden value="{{storeId}}" />
+            <input name="aisleId" hidden value="{{aisle}}" />
+            <input name="productId" hidden value="{{id}}" />
+            <p>{{name}}</p>
+            <button type="submit">add</button>
+          </form>
+        {{/products}}
+        </br>
+      </div>
     {{/aisles}}
+
   {{/store}}
+
+  <ul>
+  {{#list}}
+    {{#aisle}}
+    <li>
+      {{name}}
+      <ul>
+        {{#products}}
+          <li>{{name}}</li>
+        {{/products}}
+      </ul>
+    </li>
+    {{/aisle}}
+  {{/list}}
+  </ul>
 
 </body>
 </html>

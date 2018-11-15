@@ -2,9 +2,17 @@
 <html>
 <body >
 
-  <p>create a store</p>
+
   <form>
-    <input name="name" placeholder="name of store" />
+    <input name="storeId" value={{storeId}} hidden />
+    <input name="userId" value={{userId}} hidden />
+    
+    <select name="itemId">
+      {{#products}}
+        <option value="{{id}}">{{name}}</option>
+      {{/products}}
+    </select>
+    
   </form>
 
 </body>

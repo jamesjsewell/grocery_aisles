@@ -27,20 +27,38 @@ app.post('/user', function(req, res){
 
 app.post('/list', function(req, res){
 
-  const { storeId, aisleId, productId, userId } = req.body
-  
-  if(storeId && aisleId && productId && userId){
-    store.create({
+  const { storeId, aisleId, productId } = req.body
+
+  if(storeId && aisleId && productId){
+    list.create({
       store_id: parseInt(storeId),
       aisle_id: parseInt(aisleId),
       product_id: parseInt(productId),
-      user_id: parseInt(userId)
+      user_id: 1
     }).then((result)=>{
       res.json({created: result})
     })
   }
   
 })
+
+function getStoreInventory(storeId, onStoreFound){
+
+  store.findOne({
+    where: { id: parseInt(storeId) }, include: [{ model: aisle, include: [ {model: product} ] }]
+  }).then((result)=>{
+
+    if(result){
+      var store = result.get({ plain: true })    
+      onStoreFound(store)
+    }
+    else{
+      return { message: "store not found" }
+    }
+    
+  })
+
+}
 
 app.get('/shop/store/:storeId', function(req, res){
 
@@ -50,36 +68,24 @@ app.get('/shop/store/:storeId', function(req, res){
   list.findAll({
     where: { store_id: parseInt(storeId), user_id: 1 }, 
     include: 
-    [
       { 
-        model: store, 
-        include: [
-          { 
-            model: aisle, 
-            include: [ { model: product } ] 
-          }
-        ] 
+        model: aisle,
+     
       }
-    ]
-  }).then((results)=>{  
-    console.log(results)
-  
-    if(results){
+  }).then((results)=>{ 
 
-      results.forEach(function(result){
+    //var listEntries = results.get({plain: true})
+    console.log(results[0].get({plain: true}))
+    function onStoreFound(store) {
 
-        var store = result.get({ plain: true })  
-        console.log(store) 
-        //return res.render('shop', { store: store })
+      res.render( 'shop', { storeId: storeId, userId: userId, store: store, list: null } )
 
-      })
-      
-    }
-    else{
-      
+
     }
 
-    return res.render('shop', { store: null })
+    getStoreInventory(storeId, onStoreFound)
+    
+    //return res.render( 'shop', { storeId: storeId, userId: userId } )
     
   }).catch(function(err){
       console.log(err)
@@ -90,23 +96,14 @@ app.get('/shop/store/:storeId', function(req, res){
 
 // stores
 app.get('/store/:id', function(req, res){
- 
-  store.findOne({
-    where: { id: parseInt(req.params.id) }, include: [{ model: aisle, include: [ {model: product} ] }]
-  }).then((result)=>{
 
-    if(result){
-      var store = result.get({ plain: true })    
-      return res.render('store', { store: store })
-    }
-    else{
-      return res.render('store', { message: "store not found" })
-    }
+  function onStoreFound(store){
     
-  }).catch(function(err){
-      console.log(err)
-      return res.render('error_message', { message: "something went wrong", route: "/store/" + req.params.id })
-  })
+    res.render('store', { store: store })
+
+  }
+
+  getStoreInventory(req.params.id, onStoreFound)
 
 })
 
