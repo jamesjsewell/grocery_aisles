@@ -37,7 +37,7 @@ app.post('/list', function(req, res){
       product_id: parseInt(productId),
       user_id: 1
     }).then((result)=>{
-      res.json({created: result})
+      res.redirect('/shop/store/' + storeId)
     })
   }
   
@@ -69,17 +69,41 @@ app.get('/shop/store/:storeId', function(req, res){
   list.findAll({
     where: { store_id: parseInt(storeId), user_id: 1 }, 
     include: 
+    [
       { 
-        model: aisle,
+        model: product ,
+        as: 'theProduct' 
      
+      },
+      {
+        model: aisle, 
+        as: 'theAisle' 
       }
+    ]
   }).then((results)=>{ 
 
     //var listEntries = results.get({plain: true})
-    console.log(results[0].get({plain: true}))
+  
+    var listEntries = results
+
+    var parsedEntries = []
+
+    if(listEntries.length){
+
+      listEntries.forEach(function(entry){
+        var parsedEntry = entry.get({plain: true})
+        parsedEntries.push(parsedEntry)
+
+      })
+
+    }
+
+    console.log(parsedEntries)
+    
+
     function onStoreFound(store) {
 
-      res.render( 'shop', { storeId: storeId, userId: userId, store: store, list: null } )
+      res.render( 'shop', { storeId: storeId, userId: userId, store: store, list: parsedEntries } )
 
 
     }

@@ -24,18 +24,16 @@
 
   {{/store}}
 
+  <h4>your current selection</h4>
   <ul>
   {{#list}}
-    {{#aisle}}
-    <li>
-      {{name}}
-      <ul>
-        {{#products}}
-          <li>{{name}}</li>
-        {{/products}}
-      </ul>
-    </li>
-    {{/aisle}}
+    {{#theAisle}}
+      <p>{{name}}</p>
+    {{/theAisle}}
+
+    {{#theProduct}}
+      <p>{{name}}</p>
+    {{/theProduct}}
   {{/list}}
   </ul>
 
