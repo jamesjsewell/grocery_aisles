@@ -12,36 +12,8 @@ app.engine('mustache',mustacheExpress())
 app.set('views','./views')
 app.set('view engine','mustache')
 
-app.post('/user', function(req, res){
-
-  const fname = req.body.fname
-  const lname = req.body.lname
-
-  user.create({
-    fname: fname,
-    lname: lname
-  }).then((result)=>{
-    res.json({created: result})
-  })
-
-})
-
-app.post('/list', function(req, res){
-
-  const { storeId, aisleId, productId } = req.body
-
-  if(storeId && aisleId && productId){
-    list.create({
-      store_id: parseInt(storeId),
-      aisle_id: parseInt(aisleId),
-      product_id: parseInt(productId),
-      user_id: 1
-    }).then((result)=>{
-      res.redirect('/shop/store/' + storeId)
-    })
-  }
-  
-})
+const manageStoreBaseUrl = '/manage/store/'
+const inventoryBaseUrl = '/inventory/store/'
 
 function getStoreInventory(storeId, onStoreFound){
 
@@ -61,7 +33,36 @@ function getStoreInventory(storeId, onStoreFound){
 
 }
 
-app.get('/shop/store/:storeId', function(req, res){
+app.get('/', function(req, res){
+  res.redirect('/stores')
+})
+
+app.get('/admin/stores', function(req, res){
+
+  store.findAll().then(function(results){
+
+    results.map(function(result){
+      return result.get({plain: true})
+    })
+    res.render("admin_stores", {stores: results})
+  })
+  
+
+})
+
+app.get('/stores', function(req, res){
+  store.findAll().then(function(results){
+
+    results.map(function(result){
+      return result.get({plain: true})
+    })
+    res.render("stores", {stores: results})
+  })
+  
+
+})
+
+app.get(inventoryBaseUrl + ':storeId', function(req, res){
 
   var storeId = req.params.storeId
   var userId = 1
@@ -81,8 +82,6 @@ app.get('/shop/store/:storeId', function(req, res){
       }
     ]
   }).then((results)=>{ 
-
-    //var listEntries = results.get({plain: true})
   
     var listEntries = results
 
@@ -97,10 +96,7 @@ app.get('/shop/store/:storeId', function(req, res){
         var aisleName = parsedEntry.theAisle[0].name
         var product = parsedEntry.theProduct[0]
 
-    
-
-
-
+  
         if(sortedByAisle[aisleName]){
 
           sortedByAisle[aisleName].push(product)
@@ -128,14 +124,14 @@ app.get('/shop/store/:storeId', function(req, res){
 
     function onStoreFound(store) {
 
-      res.render( 'shop', { storeId: storeId, userId: userId, store: store, aisles: arrayOfAisles } )
+      res.render( 'inventory', { storeId: storeId, userId: userId, store: store, aisles: arrayOfAisles } )
 
 
     }
 
     getStoreInventory(storeId, onStoreFound)
     
-    //return res.render( 'shop', { storeId: storeId, userId: userId } )
+
     
   }).catch(function(err){
       console.log(err)
@@ -144,12 +140,11 @@ app.get('/shop/store/:storeId', function(req, res){
 
 })
 
-// stores
-app.get('/store/:id', function(req, res){
+app.get(manageStoreBaseUrl + ':id', function(req, res){
 
   function onStoreFound(store){
     
-    res.render('store', { store: store })
+    res.render('manage_inventory', { store: store })
 
   }
   
@@ -171,7 +166,7 @@ app.post('/aisle', function(req, res){
     name: name,
     store_id: parseInt(storeId)
   }).then((result)=>{
-    res.redirect('/store/' + storeId)
+    res.redirect(manageStoreBaseUrl + storeId)
   })
 })
 
@@ -184,7 +179,7 @@ app.post('/product', function(req, res){
     price: parseFloat(price),
     aisle: parseInt(aisle)
   }).then((result)=>{
-    res.redirect('/store/' + storeId )
+    res.redirect(manageStoreBaseUrl + storeId )
   })
 })
 
@@ -193,13 +188,40 @@ app.post('/store', function(req, res){
   store.create({
     name: name
   }).then((result)=>{
-    res.json({created: result})
+    res.redirect('/stores')
   })
 })
 
+app.post('/list', function(req, res){
 
+  const { storeId, aisleId, productId } = req.body
 
+  if(storeId && aisleId && productId){
+    list.create({
+      store_id: parseInt(storeId),
+      aisle_id: parseInt(aisleId),
+      product_id: parseInt(productId),
+      user_id: 1
+    }).then((result)=>{
+      res.redirect(inventoryBaseUrl+ storeId)
+    })
+  }
+  
+})
 
+app.post('/user', function(req, res){
+
+  const fname = req.body.fname
+  const lname = req.body.lname
+
+  user.create({
+    fname: fname,
+    lname: lname
+  }).then((result)=>{
+    res.json({created: result})
+  })
+
+})
 
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'))
