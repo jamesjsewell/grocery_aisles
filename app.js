@@ -86,24 +86,49 @@ app.get('/shop/store/:storeId', function(req, res){
   
     var listEntries = results
 
-    var parsedEntries = []
+    var sortedByAisle = {}
 
     if(listEntries.length){
 
       listEntries.forEach(function(entry){
         var parsedEntry = entry.get({plain: true})
-        parsedEntries.push(parsedEntry)
+      
+
+        var aisleName = parsedEntry.theAisle[0].name
+        var product = parsedEntry.theProduct[0]
+
+    
+
+
+
+        if(sortedByAisle[aisleName]){
+
+          sortedByAisle[aisleName].push(product)
+      
+        }
+        else{
+          sortedByAisle[aisleName] = [product]
+        }
+        
 
       })
 
     }
 
-    console.log(parsedEntries)
-    
+
+    var arrayOfAisles = []
+
+    for(var aisleName in sortedByAisle){
+      var theAisleProducts = sortedByAisle[aisleName]
+      arrayOfAisles.push({products: theAisleProducts, name: aisleName})
+    }
+
+    console.log(arrayOfAisles)
+
 
     function onStoreFound(store) {
 
-      res.render( 'shop', { storeId: storeId, userId: userId, store: store, list: parsedEntries } )
+      res.render( 'shop', { storeId: storeId, userId: userId, store: store, aisles: arrayOfAisles } )
 
 
     }

@@ -26,15 +26,18 @@
 
   <h4>your current selection</h4>
   <ul>
-  {{#list}}
-    {{#theAisle}}
-      <p>{{name}}</p>
-    {{/theAisle}}
-
-    {{#theProduct}}
-      <p>{{name}}</p>
-    {{/theProduct}}
-  {{/list}}
+  {{#aisles}}
+    <strong>{{name}}</strong>
+    <ul>
+    {{#products}}
+      <li>
+      <h5>{{name}}</h5>
+      <p>price: {{price}}</p>
+      </li>
+    {{/products}}
+    </ul>
+    
+  {{/aisles}}
   </ul>
 
 </body>
