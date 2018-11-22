@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   list.associate = function(models) {
     // associations can be defined here
-    list.belongsToMany(models.product, {foreignKey: {name: 'id'}, through: 'lists', otherKey: 'product_id', as: 'theProduct' })
-    list.belongsToMany(models.aisle, {foreignKey: {name: 'id'}, through: 'lists', otherKey: 'aisle_id', as: 'theAisle'})
+    list.hasMany(models.product, {foreignKey: {name: 'id'}, sourceKey: 'product_id', as: 'theProduct' })
+    list.hasMany(models.aisle, {foreignKey: {name: 'id'}, sourceKey: 'aisle_id', as: 'theAisle'})
 
    
   };
